@@ -1,0 +1,18 @@
+{
+    "player_position": {
+      "version": "1.56",
+      "pattern": "F3 0F 10 89 ?? ?? ?? ?? F3 0F 10 81",
+      "notes": "player pos block, x y z floats"
+    },
+    "vehicle_speed": {
+      "version": "1.56",
+      "pattern": "F3 0F 10 41 ?? F3 0F 59 05 ?? ?? ?? ??",
+      "notes": "speed float pointer pattern"
+    },
+    "vehicle_heading": {
+      "version": "1.56",
+      "pattern": "F3 0F 10 40 ?? F3 0F 10 48",
+      "notes": "heading rad"
+    }
+}
+  
