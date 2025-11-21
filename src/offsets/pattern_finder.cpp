@@ -1,37 +1,37 @@
 #include "pattern_finder.h"
 #include "memory_scanner.h"
-#include <cstring>
+#include <sstream>
 
-extern MemoryScanner g_scanner; // ensure you have a global scanner instance
+extern MemoryScanner g_scanner;
 
-void PatternFinder::parse_pattern(const std::string& sig, std::vector<uint8_t>& outBytes, std::string& outMask) {
-    outBytes.clear();
-    outMask.clear();
-    size_t i = 0;
-    while (i < sig.size()) {
-        if (sig[i] == ' ') { ++i; continue; }
-        if (sig[i] == '?') {
-            outBytes.push_back(0);
-            outMask.push_back('?');
-            // skip both ? or ?? tokens
-            if (i + 1 < sig.size() && sig[i+1] == '?') i += 2; else ++i;
-        } else {
-            // read two hex
-            auto hex = sig.substr(i, 2);
-            uint8_t b = static_cast<uint8_t>(std::stoul(hex, nullptr, 16));
-            outBytes.push_back(b);
-            outMask.push_back('x');
-            i += 2;
+void PatternFinder::parse_pattern(const std::string& patternStr,
+                                  std::vector<int>& outPattern) const
+{
+    outPattern.clear();
+    std::istringstream iss(patternStr);
+    std::string token;
+
+    while (iss >> token)
+    {
+        if (token == "??" || token == "?")
+        {
+            outPattern.push_back(-1); // wildcard
+        }
+        else
+        {
+            int value = std::stoi(token, nullptr, 16);
+            outPattern.push_back(value & 0xFF);
         }
     }
 }
 
-uintptr_t PatternFinder::find(const std::string& pattern, const std::string& mask) const {
-    // pattern is already parsed form: better to use parse_pattern then call scanner.find_pattern_bytes
-    std::vector<uint8_t> bytes;
-    std::string computedMask;
-    parse_pattern(pattern, bytes, computedMask);
+uintptr_t PatternFinder::find(const std::string& pattern) const
+{
+    std::vector<int> parsed;
+    parse_pattern(pattern, parsed);
 
-    // Use MemoryScanner's find by bytes (implement below)
-    return g_scanner.find_pattern_bytes(bytes.data(), computedMask.c_str(), bytes.size());
+    if (parsed.empty())
+        return 0;
+
+    return g_scanner.find_pattern_bytes(parsed);
 }
