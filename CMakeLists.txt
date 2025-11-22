@@ -1,44 +1,77 @@
-cmake_minimum_required(VERSION 3.20)
+cmake_minimum_required(VERSION 3.15)
+project(SkullNetworkTelemetry LANGUAGES CXX)
 
-project(SkullNetworkTelemetry
-    VERSION 1.0
-    LANGUAGES CXX
-)
+add_definitions(-DWIN32_LEAN_AND_MEAN)
 
-# Set C++ standard
+# Windows only
+if(NOT WIN32)
+    message(FATAL_ERROR "This project can be built only on Windows.")
+endif()
+
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-# Force MSVC runtime to be static or dynamic (default: dynamic)
-set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreadedDLL")
+# Output DLL
+set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
 
-# Source files
-file(GLOB_RECURSE SRC_FILES
-    "src/*.cpp"
-    "src/**/*.cpp"
+# =========
+#  SOURCES
+# =========
+set(SOURCES
+    src/dllmain.cpp
+    src/plugin.cpp
+    src/network_client.cpp
+    src/telemetry_manager.cpp
+    src/memory_scanner.cpp
+
+    # telemetry payload header-only
+    src/telemetry_payload.h
+
+    # OFFSETS
+    src/offsets/offsets.cpp
+    src/offsets/offsets_resolver.cpp
+    src/offsets/pattern_finder.cpp
+    src/offsets/truck_reader.cpp
+
+    # SIGNATURES
+    src/signatures/signatures.h
+    src/signatures/signatures_truck.h
+    src/signatures/signatures_job.h
 )
 
-# Include directories
+# =========
+#  INCLUDE DIRS
+# =========
 include_directories(
     ${CMAKE_SOURCE_DIR}/src
     ${CMAKE_SOURCE_DIR}/src/offsets
     ${CMAKE_SOURCE_DIR}/src/signatures
-    ${CMAKE_SOURCE_DIR}/extern  # ← json.hpp
+    ${CMAKE_SOURCE_DIR}/scs_telemetry
 )
 
-# Build DLL
-add_library(SkullNetworkTelemetry SHARED ${SRC_FILES})
+# =========
+#  CREATE DLL
+# =========
+add_library(SkullNetworkTelemetry SHARED ${SOURCES})
 
-# Windows libs
-target_link_libraries(SkullNetworkTelemetry PRIVATE
-    Ws2_32
-    Psapi
+# =========
+#  WINDOWS LIBRARIES
+# =========
+target_link_libraries(SkullNetworkTelemetry
+    ws2_32
+    psapi
 )
 
-# Output folder
-set_target_properties(SkullNetworkTelemetry PROPERTIES
-    RUNTIME_OUTPUT_DIRECTORY_RELEASE ${CMAKE_BINARY_DIR}/Release
-    RUNTIME_OUTPUT_DIRECTORY_DEBUG ${CMAKE_BINARY_DIR}/Debug
+# =========
+#   DEFINITIONS
+# =========
+target_compile_definitions(SkullNetworkTelemetry
+    PRIVATE _CRT_SECURE_NO_WARNINGS
 )
 
-message(STATUS "SkullNetworkTelemetry configured successfully")
+# =========
+#  JSON library workaround (header included manually)
+# =========
+# If you want to use embedded json.hpp (recommended)
+target_include_directories(SkullNetworkTelemetry PRIVATE ${CMAKE_SOURCE_DIR}/external)
+
