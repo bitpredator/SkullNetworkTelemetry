@@ -1,0 +1,21 @@
+name: CppCheck
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  cppcheck:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install cppcheck
+        run: sudo apt-get install -y cppcheck
+
+      - name: Run Analysis
+        run: cppcheck --enable=all --inconclusive --std=c++17 --suppress=missingIncludeSystem src/

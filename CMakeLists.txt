@@ -1,66 +1,44 @@
 cmake_minimum_required(VERSION 3.20)
 
-# Project
 project(SkullNetworkTelemetry
     VERSION 1.0
     LANGUAGES CXX
 )
 
-# Imposta C++20
+# Set C++ standard
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_CXX_EXTENSIONS OFF)
 
-# Compilazione a 64-bit
-if(NOT CMAKE_SIZEOF_VOID_P EQUAL 8)
-    message(FATAL_ERROR "Only 64-bit build is supported")
-endif()
+# Force MSVC runtime to be static or dynamic (default: dynamic)
+set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreadedDLL")
 
-# Definisce cartelle sorgenti
-set(SRC_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src")
-set(OFFSETS_DIR "${SRC_DIR}/offsets")
-set(SIGNATURES_DIR "${SRC_DIR}/signatures")
-
-# Lista completa dei file sorgenti
-set(SOURCES
-    ${SRC_DIR}/dllmain.cpp
-    ${SRC_DIR}/plugin.cpp
-    ${SRC_DIR}/telemetry_manager.cpp
-    ${SRC_DIR}/network_client.cpp
-    ${SRC_DIR}/telemetry_payload.cpp
-    ${OFFSETS_DIR}/offsets_resolver.cpp
-    ${OFFSETS_DIR}/memory_scanner.cpp
-    ${OFFSETS_DIR}/pattern_finder.cpp
+# Source files
+file(GLOB_RECURSE SRC_FILES
+    "src/*.cpp"
+    "src/**/*.cpp"
 )
 
 # Include directories
 include_directories(
-    ${SRC_DIR}
-    ${OFFSETS_DIR}
-    ${SIGNATURES_DIR}
+    ${CMAKE_SOURCE_DIR}/src
+    ${CMAKE_SOURCE_DIR}/src/offsets
+    ${CMAKE_SOURCE_DIR}/src/signatures
+    ${CMAKE_SOURCE_DIR}/extern  # ← json.hpp
 )
 
-# Setta output DLL
-set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
-add_library(SkullNetworkTelemetry SHARED ${SOURCES})
+# Build DLL
+add_library(SkullNetworkTelemetry SHARED ${SRC_FILES})
 
-# Link con librerie Windows necessarie
-target_link_libraries(SkullNetworkTelemetry
-    PRIVATE
-    ws2_32    # per socket
+# Windows libs
+target_link_libraries(SkullNetworkTelemetry PRIVATE
+    Ws2_32
+    Psapi
 )
 
-# Impostazioni per la build in Debug e Release
+# Output folder
 set_target_properties(SkullNetworkTelemetry PROPERTIES
-    RUNTIME_OUTPUT_DIRECTORY_DEBUG "${CMAKE_CURRENT_SOURCE_DIR}/build/Debug"
-    RUNTIME_OUTPUT_DIRECTORY_RELEASE "${CMAKE_CURRENT_SOURCE_DIR}/build/Release"
+    RUNTIME_OUTPUT_DIRECTORY_RELEASE ${CMAKE_BINARY_DIR}/Release
+    RUNTIME_OUTPUT_DIRECTORY_DEBUG ${CMAKE_BINARY_DIR}/Debug
 )
 
-# Opzioni compilatore Windows
-if(MSVC)
-    target_compile_options(SkullNetworkTelemetry PRIVATE /W4 /permissive- /EHsc)
-else()
-    target_compile_options(SkullNetworkTelemetry PRIVATE -Wall -Wextra -pedantic)
-endif()
-
-message(STATUS "SkullNetworkTelemetry project configured successfully")
+message(STATUS "SkullNetworkTelemetry configured successfully")

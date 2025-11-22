@@ -1,5 +1,5 @@
 #include "memory_scanner.h"
-#include < Psapi.h >
+#include <Psapi.h>
 #pragma comment(lib, "Psapi.lib")
 
 MemoryScanner::MemoryScanner() {}
