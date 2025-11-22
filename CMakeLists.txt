@@ -5,56 +5,40 @@ project(SkullNetworkTelemetry
     LANGUAGES CXX
 )
 
+# Set C++ standard
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_CXX_EXTENSIONS OFF)
 
-# Require 64-bit
-if(NOT CMAKE_SIZEOF_VOID_P EQUAL 8)
-    message(FATAL_ERROR "Only 64-bit build is supported")
-endif()
+# Force MSVC runtime to be static or dynamic (default: dynamic)
+set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreadedDLL")
 
-# Source directories
-set(SRC_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src")
-
-# Collect all .cpp files recursively (keeps CMake reconfigure when files change)
-file(GLOB_RECURSE SOURCES CONFIGURE_DEPENDS
-    "${SRC_DIR}/*.cpp"
+# Source files
+file(GLOB_RECURSE SRC_FILES
+    "src/*.cpp"
+    "src/**/*.cpp"
 )
 
-# If no sources found, print helpful message and error
-if(NOT SOURCES)
-    message(FATAL_ERROR "No source files found in ${SRC_DIR}. Did you forget to add .cpp files? Checked pattern: ${SRC_DIR}/*.cpp")
-endif()
-
-# Include dirs
+# Include directories
 include_directories(
-    ${SRC_DIR}
-    ${SRC_DIR}/offsets
-    ${SRC_DIR}/signatures
+    ${CMAKE_SOURCE_DIR}/src
+    ${CMAKE_SOURCE_DIR}/src/offsets
+    ${CMAKE_SOURCE_DIR}/src/signatures
+    ${CMAKE_SOURCE_DIR}/extern  # ← json.hpp
 )
 
-# Export all symbols automatically for DLL
-set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
+# Build DLL
+add_library(SkullNetworkTelemetry SHARED ${SRC_FILES})
 
-add_library(SkullNetworkTelemetry SHARED ${SOURCES})
+# Windows libs
+target_link_libraries(SkullNetworkTelemetry PRIVATE
+    Ws2_32
+    Psapi
+)
 
-# Link required Windows libraries
-if (WIN32)
-    target_link_libraries(SkullNetworkTelemetry PRIVATE ws2_32)
-endif()
-
-# Output directories
+# Output folder
 set_target_properties(SkullNetworkTelemetry PROPERTIES
-    RUNTIME_OUTPUT_DIRECTORY_DEBUG "${CMAKE_CURRENT_SOURCE_DIR}/build/Debug"
-    RUNTIME_OUTPUT_DIRECTORY_RELEASE "${CMAKE_CURRENT_SOURCE_DIR}/build/Release"
+    RUNTIME_OUTPUT_DIRECTORY_RELEASE ${CMAKE_BINARY_DIR}/Release
+    RUNTIME_OUTPUT_DIRECTORY_DEBUG ${CMAKE_BINARY_DIR}/Debug
 )
 
-# Compiler warnings
-if(MSVC)
-    target_compile_options(SkullNetworkTelemetry PRIVATE /W4 /permissive- /EHsc)
-else()
-    target_compile_options(SkullNetworkTelemetry PRIVATE -Wall -Wextra -pedantic)
-endif()
-
-message(STATUS "SkullNetworkTelemetry project configured successfully")
+message(STATUS "SkullNetworkTelemetry configured successfully")
