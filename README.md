@@ -49,18 +49,34 @@ The following features are planned for the next development phases:
 ## Requirements
 - Windows 10/11 x64
 - ETS2 or ATS (x64)
-- Visual Studio Code (or Visual Studio with C++ build tools)
+- Visual Studio Code with C++ build tools or full Visual Studio
 - Windows SDK installed (for headers like `windows.h`, `winsock2.h`)
 
 ---
 
+## Build Instructions
+
+### Using Visual Studio Code
+1. Open the project folder in VSCode.
+2. Ensure the **CMake Tools** extension is installed.
+3. Select a **Kit** for x64 MSVC (Visual Studio compiler).
+4. Configure the project:
+
+5. Build the project:
+6. The resulting DLL (`SkullNetworkTelemetry.dll`) will be located in the `build/Release` or `build/Debug` folder.
+
+### Using Visual Studio
+1. Open `CMakeLists.txt` using **File → Open → CMakeLists.txt**.
+2. Select **x64** and **Release** or **Debug** configuration.
+3. Build the solution (`Ctrl+Shift+B` or Build → Build All).
+4. The DLL will be in `x64/Release` or `x64/Debug` depending on configuration.
+
+---
+
 ## Usage
-1. Compile the project as **x64 DLL**.
-2. Copy `SkullNetworkTelemetry.dll` to the ETS2/ATS plugins folder:
-
-
-3. Launch the game; the plugin initializes automatically and begins sending telemetry data.
-4. Connect your backend server to the default TCP port (5500) or configure via JSON.
+1. Copy `SkullNetworkTelemetry.dll` to the ETS2/ATS plugins folder.
+2. Launch the game; the plugin initializes automatically and begins sending telemetry data.
+3. Connect your backend server to the default TCP port (5500) or configure via JSON.
 
 ---
 
@@ -71,4 +87,3 @@ This project is **open-source** and intended for the Skull Network Italia commun
 
 ## Contributing
 Please open GitHub issues or pull requests for bug fixes, feature requests, or improvements. Ensure all contributions maintain thread safety and compatibility with x64 ETS2/ATS builds.
-
