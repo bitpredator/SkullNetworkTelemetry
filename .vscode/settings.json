@@ -1,0 +1,31 @@
+{
+    "files.associations": {
+        "iostream": "cpp",
+        "thread": "cpp",
+        "chrono": "cpp",
+        "cstring": "cpp",
+        "atomic": "cpp",
+        "random": "cpp",
+        "sstream": "cpp",
+        "vector": "cpp",
+        "iomanip": "cpp",
+        "memory": "cpp",
+        "algorithm": "cpp",
+        "initializer_list": "cpp",
+        "iterator": "cpp",
+        "utility": "cpp",
+        "array": "cpp",
+        "forward_list": "cpp",
+        "map": "cpp",
+        "string": "cpp",
+        "tuple": "cpp",
+        "type_traits": "cpp",
+        "unordered_map": "cpp",
+        "valarray": "cpp",
+        "cstddef": "cpp",
+        "exception": "cpp",
+        "numeric": "cpp",
+        "cstdint": "cpp",
+        "fstream": "cpp"
+    }
+}
