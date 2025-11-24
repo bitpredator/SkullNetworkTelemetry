@@ -1,21 +1,25 @@
 #pragma once
-#include <winsock2.h>
-#include <windows.h>
 #include <vector>
 #include <string>
+#include <windows.h>
 
 class MemoryScanner {
 public:
-    MemoryScanner();
+    // Singleton accessor
+    static MemoryScanner& instance() {
+        static MemoryScanner inst;
+        return inst;
+    }
 
-    bool initialize();
-
-    // Nuovo metodo necessario al PatternFinder
-    uintptr_t find_pattern_bytes(const std::vector<int>& pattern) const;
-
-    bool read(uintptr_t address, void* buffer, size_t size) const;
+    bool attach(const std::wstring& procName);
+    uintptr_t find_pattern(const std::vector<uint8_t>& pattern, const std::string& mask);
+    bool read_bytes(uintptr_t address, void* buffer, size_t size) const;
 
 private:
-    uintptr_t base_address = 0;
-    size_t module_size = 0;
+    MemoryScanner() = default;            // Singleton: costruttore privato
+    MemoryScanner(const MemoryScanner&) = delete;
+    MemoryScanner& operator=(const MemoryScanner&) = delete;
+
+private:
+    HANDLE hProc = NULL;
 };

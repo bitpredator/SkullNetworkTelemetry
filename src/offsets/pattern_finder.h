@@ -1,13 +1,27 @@
 #pragma once
-#include <string>
 #include <vector>
+#include <string>
+#include <cstdint>
 
 class PatternFinder {
 public:
-    // Cerca un pattern in formato sig: "F3 0F 10 ?? ?? 89"
-    uintptr_t find(const std::string& pattern) const;
+
+    // Singleton accessor
+    static PatternFinder& instance() {
+        static PatternFinder inst;
+        return inst;
+    }
+
+    // Cerca una pattern string "AA BB ?? CC"
+    uintptr_t find(const std::string& pattern);
+
+    // Converte la pattern in byte + mask
+    static bool parse_pattern(const std::string& pattern,
+                              std::vector<uint8_t>& bytes,
+                              std::string& mask);
 
 private:
-    // Converte la stringa signature → vector<int> con wildcard -1
-    void parse_pattern(const std::string& patternStr, std::vector<int>& outPattern) const;
+    PatternFinder() = default;                    // costruttore privato
+    PatternFinder(const PatternFinder&) = delete;
+    PatternFinder& operator=(const PatternFinder&) = delete;
 };

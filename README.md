@@ -1,89 +1,96 @@
 # SkullNetworkTelemetry
 
 ## Overview
-**SkullNetworkTelemetry** is a custom telemetry plugin for Euro Truck Simulator 2 (ETS2) and American Truck Simulator (ATS), designed specifically for the Skull Network Italia community. Unlike standard mods, this plugin is implemented as a standalone **DLL** (`SkullNetworkTelemetry.dll`) that interfaces directly with the SCS Telemetry API and transmits vehicle and job data to a web-based map system.
+**SkullNetworkTelemetry** is a custom telemetry plugin for *Euro Truck Simulator 2* (ETS2) and *American Truck Simulator* (ATS), built specifically for the **Skull Network Italia** community.
 
-The current version provides the foundational structure for a telemetry system, including:
-
-- DLL entry points compatible with SCS Telemetry API (`scs_plugin_init` and `scs_plugin_shutdown`)
-- Background worker thread for continuous telemetry updates
-- TCP network client for sending JSON payloads to a backend server
-- Minimal telemetry payload structure with session ID, vehicle position, speed, heading, and truck information
-- Modular and scalable C++17 codebase
-
-This project is developed using **Visual Studio Code** and targets **x64 Windows systems**, ensuring compatibility with the latest ETS2 and ATS versions.
+The plugin operates as a standalone **DLL** (`SkullNetworkTelemetry.dll`) placed in the game’s `/plugins` folder.  
+It communicates directly with the **SCS Telemetry API** and sends structured telemetry data to a backend server for live map visualization and community features.
 
 ---
 
-## Current Status
-- Initial DLL skeleton implemented (`plugin.h`, `plugin.cpp`, `dllmain.cpp`)
-- Thread-safe network client implemented for reliable TCP communication
-- Telemetry payloads serialized to JSON and sent at configurable intervals
-- Placeholder data provided for initial testing; ready for integration with real SCS API callbacks
+## Features (Current)
+- ✔ Correctly exported SCS API plugin entry points  
+- ✔ Background telemetry thread via `TelemetryManager`  
+- ✔ TCP client (`NetworkClient`) that sends JSON payloads periodically  
+- ✔ C++20 clean architecture  
+- ✔ Full DLL stability (no more missing symbols or export issues)  
+- ✔ Ready for integration with real truck/job telemetry callbacks  
+
+---
+
+## Latest Changes
+See the latest changelog in the pull request for all updates related to:
+- SCS SDK headers
+- Exported functions
+- CMake improvements
+- Network and telemetry loop stabilization
+- Proper shutdown handling
 
 ---
 
 ## Future Work
-The following features are planned for the next development phases:
+Planned features include:
 
-1. **Full SCS Telemetry API Integration**
-   - Register callbacks for truck data, trailer, job, and engine parameters
-   - Extract real-time position, speed, damage, and cargo information
-2. **Extended Payload**
-   - Include departure and destination cities
-   - Include cargo, job status, and additional vehicle metrics
-   - Add configurable fields for community-specific telemetry
+1. **Full Telemetry Integration**
+   - Position, speed, orientation
+   - Trailer & job data
+   - Cargo info, damage, economy stats
+
+2. **Extended JSON Payload**
+   - Origin/destination cities
+   - Job progress
+   - Configurable telemetry fields
+
 3. **Backend Integration**
-   - Build a C# server capable of receiving and storing telemetry data
-   - Implement authentication and secure data transmission
-   - Provide live map updates on the Skull Network Italia website
-4. **Performance and Reliability**
-   - Implement batching or compression of telemetry data (JSON/Gzip/Protobuf)
-   - Ensure minimal CPU and memory impact on the game
-5. **Configuration and Deployment**
-   - Configurable host/port via JSON file
-   - Easy deployment as a DLL plugin for ETS2/ATS without modifying the game
+   - Official Skull Network Italia back-end server  
+   - Secure communication  
+   - Live map support  
+
+4. **Performance Improvements**
+   - Efficient serialization  
+   - Optional GZip/Protobuf  
+   - Optimized threading  
+
+5. **Config System**
+   - Custom `config.json` (host/port/interval, etc.)
 
 ---
 
 ## Requirements
-- Windows 10/11 x64
-- ETS2 or ATS (x64)
-- Visual Studio Code with C++ build tools or full Visual Studio
-- Windows SDK installed (for headers like `windows.h`, `winsock2.h`)
+- Windows 10/11 x64  
+- ETS2 or ATS (x64)  
+- Visual Studio Build Tools / MSVC  
+- Windows SDK (for `windows.h`, Winsock)  
+- CMake or Visual Studio  
 
 ---
 
-## Build Instructions
+## Build & Installation
+1. Compile as **x64 DLL**.
+2. Copy `SkullNetworkTelemetry.dll` to:
 
-### Using Visual Studio Code
-1. Open the project folder in VSCode.
-2. Ensure the **CMake Tools** extension is installed.
-3. Select a **Kit** for x64 MSVC (Visual Studio compiler).
-4. Configure the project:
+<ETS2 OR ATS INSTALL FOLDER>/bin/win_x64/plugins/
 
-5. Build the project:
-6. The resulting DLL (`SkullNetworkTelemetry.dll`) will be located in the `build/Release` or `build/Debug` folder.
 
-### Using Visual Studio
-1. Open `CMakeLists.txt` using **File → Open → CMakeLists.txt**.
-2. Select **x64** and **Release** or **Debug** configuration.
-3. Build the solution (`Ctrl+Shift+B` or Build → Build All).
-4. The DLL will be in `x64/Release` or `x64/Debug` depending on configuration.
+3. Launch the game.  
+4. The plugin automatically initializes and connects to the backend (default port: **5500**).
 
 ---
 
-## Usage
-1. Copy `SkullNetworkTelemetry.dll` to the ETS2/ATS plugins folder.
-2. Launch the game; the plugin initializes automatically and begins sending telemetry data.
-3. Connect your backend server to the default TCP port (5500) or configure via JSON.
+## Community & Support
+Join the official **Skull Network Italia Discord**:  
+👉 **https://discord.gg/Jrm2Z26ad3**
 
 ---
 
 ## License
-This project is **open-source** and intended for the Skull Network Italia community. Contributions and suggestions are welcome.
+This project is open-source and dedicated to the **Skull Network Italia** community.
 
 ---
 
 ## Contributing
-Please open GitHub issues or pull requests for bug fixes, feature requests, or improvements. Ensure all contributions maintain thread safety and compatibility with x64 ETS2/ATS builds.
+Pull requests are welcome!  
+Please ensure code is:
+- Thread-safe  
+- Consistent with modern C++ guidelines  
+- Compatible with ETS2/ATS x64  

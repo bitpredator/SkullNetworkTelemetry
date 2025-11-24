@@ -1,57 +1,39 @@
 #include "network_client.h"
 
-NetworkClient::NetworkClient(const std::string& host, int port)
-    : host(host), port(port) {}
-
-NetworkClient::~NetworkClient() {
-    if (sock != INVALID_SOCKET) {
-        closesocket(sock);
-    }
-    WSACleanup();
-}
-
-bool NetworkClient::connect_socket() {
-    WSADATA wsa;
-
-    if (WSAStartup(MAKEWORD(2, 2), &wsa) != 0) {
-        std::cerr << "[NetworkClient] WSAStartup failed!" << std::endl;
-        return false;
-    }
+bool NetworkClient::connect_to_server(const std::string& host, int port) {
+    WSADATA wsaData;
+    WSAStartup(MAKEWORD(2, 2), &wsaData);
 
     sock = socket(AF_INET, SOCK_STREAM, 0);
-    if (sock == INVALID_SOCKET) {
-        std::cerr << "[NetworkClient] Error creating socket!" << std::endl;
+    if (sock == INVALID_SOCKET)
         return false;
-    }
 
     sockaddr_in server{};
     server.sin_family = AF_INET;
     server.sin_port = htons(port);
+    inet_pton(AF_INET, host.c_str(), &server.sin_addr);
 
-    if (inet_pton(AF_INET, host.c_str(), &server.sin_addr) <= 0) {
-        std::cerr << "[NetworkClient] Invalid host address!" << std::endl;
+    if (connect(sock, (sockaddr*)&server, sizeof(server)) == SOCKET_ERROR) {
+        closesocket(sock);
+        sock = INVALID_SOCKET;
         return false;
     }
 
-    if (connect(sock, reinterpret_cast<sockaddr*>(&server), sizeof(server)) < 0) {
-        std::cerr << "[NetworkClient] Connection to server failed!" << std::endl;
-        return false;
-    }
-
-    std::cout << "[NetworkClient] Connected to " << host << ":" << port << std::endl;
+    connected = true;
     return true;
 }
 
-bool NetworkClient::send(const std::string& message) {
-    if (sock == INVALID_SOCKET)
-        return false;
-
-    int result = ::send(sock, message.c_str(), (int)message.size(), 0);
-
-    if (result == SOCKET_ERROR) {
-        std::cerr << "[NetworkClient] Send failed!" << std::endl;
-        return false;
+void NetworkClient::disconnect() {
+    if (sock != INVALID_SOCKET) {
+        closesocket(sock);
+        sock = INVALID_SOCKET;
     }
+    connected = false;
+    WSACleanup();
+}
 
-    return true;
+bool NetworkClient::send_data(const std::string& data) {
+    if (!connected) return false;
+    int sent = send(sock, data.c_str(), data.size(), 0);
+    return sent == (int)data.size();
 }
