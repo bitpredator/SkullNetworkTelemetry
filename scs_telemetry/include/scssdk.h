@@ -1,32 +1,34 @@
 #pragma once
+
 #include <stdint.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-// Basic SCS API export macro
-#define SCSAPI extern "C" __declspec(dllexport)
-
-// Primitive types
+typedef uint8_t  scs_bool_t;
+typedef uint8_t  scs_u8_t;
+typedef uint16_t scs_u16_t;
 typedef uint32_t scs_u32_t;
 typedef uint64_t scs_u64_t;
+typedef int8_t   scs_s8_t;
 typedef int32_t  scs_s32_t;
 typedef int64_t  scs_s64_t;
 
-typedef float  scs_float_t;
-typedef double scs_double_t;
+typedef float    scs_float_t;
+typedef double   scs_double_t;
 
-typedef uint8_t scs_bool_t;
+typedef uint32_t scs_string_t; // not used here - keep for compatibility
 
-// API result codes
-typedef scs_u32_t SCSAPI_RESULT;
-#define SCS_RESULT_ok               0
-#define SCS_RESULT_unsupported      1
-#define SCS_RESULT_generic_error    2
+#define SCS_TRUE  1
+#define SCS_FALSE 0
 
-// VOID type for exported functions
-#define SCSAPI_VOID void
+// export macro (for plugin functions)
+#ifdef _WIN32
+  #define SCSAPI extern "C" __declspec(dllexport)
+#else
+  #define SCSAPI
+#endif
 
 #ifdef __cplusplus
 }

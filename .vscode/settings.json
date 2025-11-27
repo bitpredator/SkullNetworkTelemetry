@@ -26,6 +26,8 @@
         "exception": "cpp",
         "numeric": "cpp",
         "cstdint": "cpp",
-        "fstream": "cpp"
+        "fstream": "cpp",
+        "xstring": "cpp",
+        "mutex": "cpp"
     }
 }

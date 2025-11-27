@@ -1,24 +1,35 @@
 #pragma once
 
-// include degli header SCS (se li hai)
-#include "scssdk.h"
-#include "scssdk_plugin.h"
-#include "scssdk_telemetry.h"
+// === SCS SDK modern headers ===
+#include <scssdk.h>
+#include <scssdk_value.h>
+#include <scssdk_telemetry.h>
+#include <scssdk_plugin.h>
 
-// Se stai compilando come C++ mantieni extern "C" per le API esportate
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-// Funzioni richieste dall'SDK Telemetry (esportate)
-SCSAPI_RESULT scs_telemetry_init(const scs_telemetry_init_params_t *params);
-SCSAPI_VOID   scs_telemetry_shutdown();
+// ===============================
+//  Plugin required exports
+// ===============================
+
+// Called when the game loads the telemetry plugin
+SCSAPI_RESULT scs_telemetry_init(
+    const scs_telemetry_init_params_t* params
+);
+
+// Called when the game unloads the plugin
+// NOTE: SCSAPI_VOID NON ESISTE – usare semplicemente void
+void scs_telemetry_shutdown();
 
 #ifdef __cplusplus
-} // extern "C"
+}
 #endif
 
-// Funzione interna di pulizia richiamata da DllMain.
-// Non deve essere esportata necessariamente; dichiariamola in C++
-// (va bene anche in extern "C" ma non è obbligatorio).
+// ===============================
+//  Internal C++ helpers
+// ===============================
+
+// Called from DllMain or your internal cleanup logic
 void plugin_shutdown();

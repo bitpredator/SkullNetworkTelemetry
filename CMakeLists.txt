@@ -12,11 +12,9 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
 
 # =========
-#  SCS SDK SOURCES
+#  SCS SDK INCLUDE (aggiornato)
 # =========
-file(GLOB SCS_SDK_SOURCES
-    ${CMAKE_SOURCE_DIR}/scs_telemetry/src/*.cpp
-)
+set(SCS_SDK_INCLUDE ${CMAKE_SOURCE_DIR}/scs_sdk)
 
 # =========
 #  MAIN SOURCES
@@ -42,7 +40,7 @@ include_directories(
     ${CMAKE_SOURCE_DIR}/src
     ${CMAKE_SOURCE_DIR}/src/offsets
     ${CMAKE_SOURCE_DIR}/src/signatures
-    ${CMAKE_SOURCE_DIR}/scs_telemetry/include
+    ${SCS_SDK_INCLUDE}          # <--- FIX
 )
 
 # ========
@@ -50,7 +48,6 @@ include_directories(
 # ========
 add_library(SkullNetworkTelemetry SHARED
     ${SOURCES}
-    ${SCS_SDK_SOURCES}
 )
 
 target_link_libraries(SkullNetworkTelemetry
@@ -61,5 +58,3 @@ target_link_libraries(SkullNetworkTelemetry
 target_compile_definitions(SkullNetworkTelemetry
     PRIVATE _CRT_SECURE_NO_WARNINGS
 )
-
-target_include_directories(SkullNetworkTelemetry PRIVATE ${CMAKE_SOURCE_DIR}/external)
