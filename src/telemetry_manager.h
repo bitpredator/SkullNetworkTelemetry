@@ -4,11 +4,11 @@
 #include <atomic>
 #include <mutex>
 #include <string>
+#include <sstream>
+#include <iomanip>
 
-#include "../scs_telemetry/include/scssdk_telemetry.h"
-
-// forward declaration della callback
-static void channel_callback_generic(const char* name, const scs_value_t* value, void* user);
+#include <scssdk_telemetry.h>
+#include <scssdk_value.h>
 
 class TelemetryManager {
 public:
@@ -17,14 +17,28 @@ public:
         return inst;
     }
 
+    // Called from plugin init with SDK params
     bool initialize(const scs_telemetry_init_params_t* params);
 
     void start();
     void stop();
-    bool isRunning() const { return running; }
+    bool isRunning() const { return running.load(); }
 
-    // 👉 PERMETTE alla callback di accedere ai membri privati
-    friend void ::channel_callback_generic(const char* name, const scs_value_t* value, void* user);
+    // Simple setters used by telemetry callbacks
+    void setSpeed(float s);
+    void setRPM(float r);
+    void setHeading(float h);
+    void setPosX(double v); 
+    void setPosY(double v); 
+    void setPosZ(double v);
+
+    // 🔥 ADESSO I DATI SONO PUBLIC — ACCESSIBILI DAI CALLBACK
+    std::mutex data_mutex;
+
+    double pos_x = 0.0, pos_y = 0.0, pos_z = 0.0;
+    float speed_kph = 0.0f;
+    float rpm = 0.0f;
+    float heading = 0.0f;
 
 private:
     TelemetryManager() = default;
@@ -36,11 +50,4 @@ private:
 
     std::thread worker;
     std::atomic<bool> running{false};
-    std::mutex data_mutex;
-
-    // dati runtime
-    double pos_x = 0.0, pos_y = 0.0, pos_z = 0.0;
-    float speed_kph = 0.0f;
-    float rpm = 0.0f;
-    int gear = 0;
 };

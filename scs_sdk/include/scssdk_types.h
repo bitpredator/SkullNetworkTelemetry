@@ -24,6 +24,9 @@ typedef double     scs_double_t;
 // Boolean (0=false, 1=true)
 typedef uint32_t   scs_bool_t;
 
+// Character type used by SDK strings (narrow char)
+typedef char       scs_char_t;
+
 // Version matching helper
 typedef struct {
     scs_u32_t major;

@@ -24,7 +24,14 @@ This update includes:
 - Plugin initialization and shutdown fixes
 - TCP telemetry client stabilized for JSON payload delivery
 - Logging added for better debugging
-- CMake project structure updated for modern builds
+- **TelemetryManager refactored to fix compilation issues**
+  - Removed SDK-dependent calls causing errors (`scs_event_t`, `scs_context_t`, `register_for_channel`, `scs_value_t::name`)
+  - Fixed "too many arguments" issues in channel registration
+  - Thread-safe telemetry state with mutex-protected setters
+- **CMake project cleaned**
+  - Removed non-existent source files
+  - Ensured only valid sources are compiled
+- Ready for integration with real truck/job telemetry callbacks
 
 ---
 
@@ -69,7 +76,6 @@ Planned features include:
 1. Compile as **x64 DLL**.
 2. Copy `SkullNetworkTelemetry.dll` to:
 
-<ETS2 OR ATS INSTALL FOLDER>/bin/win_x64/plugins/
 
 3. Launch the game.  
 4. The plugin automatically initializes and connects to the backend (default port: **5500**).
@@ -92,4 +98,4 @@ Pull requests are welcome!
 Please ensure code is:
 - Thread-safe  
 - Consistent with modern C++ guidelines  
-- Compatible with ETS2/ATS x64
+- Compatible with ETS2/ATS x64  

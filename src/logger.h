@@ -1,15 +1,15 @@
 #pragma once
-
 #include <string>
 
 class Logger {
 public:
-    // Scrive un messaggio semplice (no formatting)
-    static void write(const std::string& msg);
+    static void initialize(const std::string& filename = "skn_telemetry.log");
+    static void shutdown();
 
-    // Scrive un messaggio con formatting printf-style
-    static void info(const char* fmt, ...);
+    static void info(const std::string& msg);
+    static void warn(const std::string& msg);
+    static void error(const std::string& msg);
 
-    // Percorso del file di log (modificabile se vuoi)
-    static inline const char* log_path = "C:/Users/Administrator/Desktop/SkullNetworkTelemetry/plugin_log.txt";
+private:
+    static void log(const std::string& level, const std::string& msg);
 };

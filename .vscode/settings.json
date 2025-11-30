@@ -28,6 +28,9 @@
         "cstdint": "cpp",
         "fstream": "cpp",
         "xstring": "cpp",
-        "mutex": "cpp"
+        "mutex": "cpp",
+        "iosfwd": "cpp",
+        "stdexcept": "cpp",
+        "cmath": "cpp"
     }
 }

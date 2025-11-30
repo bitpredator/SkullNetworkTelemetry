@@ -1,35 +1,21 @@
 #pragma once
 
-// === SCS SDK modern headers ===
+// SCS SDK headers (in CMake abbiamo aggiunto scs_sdk/include)
 #include <scssdk.h>
-#include <scssdk_value.h>
-#include <scssdk_telemetry.h>
 #include <scssdk_plugin.h>
+#include <scssdk_telemetry.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-// ===============================
-//  Plugin required exports
-// ===============================
-
-// Called when the game loads the telemetry plugin
-SCSAPI_RESULT scs_telemetry_init(
-    const scs_telemetry_init_params_t* params
-);
-
-// Called when the game unloads the plugin
-// NOTE: SCSAPI_VOID NON ESISTE – usare semplicemente void
-void scs_telemetry_shutdown();
+// Plugin entry points required by SCS Telemetry API
+scs_result_t SCSAPI_CALL scs_telemetry_init(const scs_telemetry_init_params_t* params);
+void SCSAPI_CALL scs_telemetry_shutdown(void);
 
 #ifdef __cplusplus
 }
 #endif
 
-// ===============================
-//  Internal C++ helpers
-// ===============================
-
-// Called from DllMain or your internal cleanup logic
+// Internal cleanup helper called from DllMain
 void plugin_shutdown();
