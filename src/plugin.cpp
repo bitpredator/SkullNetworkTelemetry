@@ -3,50 +3,50 @@
 #include "network_client.h"
 #include "telemetry_manager.h"
 
-// =======================================================
-//  Funzioni richieste dal motore di ETS2/ATS
-// =======================================================
 extern "C" {
 
-// -----------------------------------------------------------
-// Quando ETS2 carica il plugin
-// -----------------------------------------------------------
-SCSAPI_RESULT scs_telemetry_init(const scs_telemetry_init_params_t *params)
+// Called by game on plugin load
+scs_result_t SCSAPI_CALL scs_telemetry_init(const scs_telemetry_init_params_t* params)
 {
-    Logger::info("[PLUGIN] scs_telemetry_init() chiamato");
+    Logger::info("[PLUGIN] scs_telemetry_init() called");
 
-    // Connessione al server TCP
-    Logger::info("[PLUGIN] Connessione al server TCP 127.0.0.1:5500...");
+    if (!params) {
+        Logger::error("[PLUGIN] params == nullptr");
+        return SCS_RESULT_generic_error;
+    }
+
+    // Try connect to backend (best-effort)
+    Logger::info("[PLUGIN] Connecting to telemetry server 127.0.0.1:5500");
     NetworkClient::instance().connect_to_server("127.0.0.1", 5500);
 
-    // Avvio manager telemetria
-    Logger::info("[PLUGIN] Avvio TelemetryManager...");
+    // Initialize TelemetryManager with SDK params (register channels if provided)
+    if (!TelemetryManager::instance().initialize(params)) {
+        Logger::error("[PLUGIN] TelemetryManager::initialize failed");
+        // still return ok so plugin remains loaded? Here we return ok but you can choose generic_error
+        // return SCS_RESULT_generic_error;
+    }
+
+    // start background worker that sends snapshots to server
     TelemetryManager::instance().start();
 
-    Logger::info("[PLUGIN] Plugin inizializzato correttamente");
+    Logger::info("[PLUGIN] Initialized");
     return SCS_RESULT_ok;
 }
 
-// -----------------------------------------------------------
-// Quando ETS2 chiude o scarica il plugin
-// -----------------------------------------------------------
-void scs_telemetry_shutdown()
+// Called by game on plugin unload
+void SCSAPI_CALL scs_telemetry_shutdown(void)
 {
-    Logger::info("[PLUGIN] scs_telemetry_shutdown() chiamato");
-
+    Logger::info("[PLUGIN] scs_telemetry_shutdown() called");
     TelemetryManager::instance().stop();
     NetworkClient::instance().disconnect();
-
-    Logger::info("[PLUGIN] Plugin terminato");
+    Logger::info("[PLUGIN] Shutdown completed");
 }
 
 } // extern "C"
 
-// =======================================================
-//  Funzione interna per DllMain
-// =======================================================
+// Called by DllMain only (safe wrapper)
 void plugin_shutdown()
 {
-    Logger::info("[PLUGIN] plugin_shutdown() chiamato da DllMain");
+    Logger::info("[PLUGIN] plugin_shutdown() called from DllMain");
     scs_telemetry_shutdown();
 }
